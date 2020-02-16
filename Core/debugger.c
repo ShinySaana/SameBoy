@@ -707,7 +707,8 @@ static const char *lstrip(const char *str)
 
 #define STOPPED_ONLY \
 if (!gb->debug_stopped) { \
-GB_log(gb, "Program is running. \n"); \
+GB_log(gb, "Error: program is running. \n"); \
+fflush(stdout); \
 return false; \
 }
 
@@ -757,6 +758,10 @@ static bool cont(GB_gameboy_t *gb, char *arguments, char *modifiers, const debug
     }
 
     gb->debug_stopped = false;
+    
+    GB_log(gb, "Program is resumed. \n");
+    fflush(stdout);
+    
     return false;
 }
 
