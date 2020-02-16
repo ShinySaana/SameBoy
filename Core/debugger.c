@@ -732,6 +732,20 @@ static void print_usage(GB_gameboy_t *gb, const debugger_command_t *command)
     GB_log(gb, "\n");
 }
 
+static bool interrupt(GB_gameboy_t *gb, char *arguments, char *modifiers, const debugger_command_t *command)
+{
+    NO_MODIFIERS
+
+    if (strlen(lstrip(arguments))) {
+        print_usage(gb, command);
+        return true;
+    }
+
+    gb->debug_stopped = true;
+    return false;
+}
+
+
 static bool cont(GB_gameboy_t *gb, char *arguments, char *modifiers, const debugger_command_t *command)
 {
     NO_MODIFIERS
@@ -1754,6 +1768,7 @@ static bool help(GB_gameboy_t *gb, char *arguments, char *modifiers, const debug
 
 /* Commands without implementations are aliases of the previous non-alias commands */
 static const debugger_command_t commands[] = {
+    {"interrupt", 1, interrupt, "Interrupt the program and enter the debugger, like ^C"},
     {"continue", 1, cont, "Continue running until next stop"},
     {"next", 1, next, "Run the next instruction, skipping over function calls"},
     {"step", 1, step, "Run the next instruction, stepping into function calls"},
