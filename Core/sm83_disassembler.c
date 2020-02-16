@@ -785,4 +785,6 @@ void GB_cpu_disassemble(GB_gameboy_t *gb, uint16_t pc, uint16_t count)
         uint8_t opcode = GB_read_memory(gb, pc);
         opcodes[opcode](gb, opcode, &pc);
     }
+    
+    fflush(stdout);
 }

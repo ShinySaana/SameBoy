@@ -1322,6 +1322,9 @@ static bool print(GB_gameboy_t *gb, char *arguments, char *modifiers, const debu
                 break;
         }
     }
+    
+    fflush(stdout);    
+    
     return true;
 }
 
@@ -1485,6 +1488,8 @@ static bool backtrace(GB_gameboy_t *gb, char *arguments, char *modifiers, const 
     for (unsigned i = gb->backtrace_size; i--;) {
         GB_log(gb, "%3d. %s\n", gb->backtrace_size - i + 1, debugger_value_to_string(gb, (value_t){true, gb->backtrace_returns[i].bank, gb->backtrace_returns[i].addr}, true));
     }
+    
+    fflush(stdout);
 
     return true;
 }
