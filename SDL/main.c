@@ -29,6 +29,10 @@
 #define SDL_AUDIO_ALLOW_SAMPLES_CHANGE 0
 #endif
 
+#ifdef __EMSCRIPTEN__
+#include "emscripten.h"
+#endif
+
 GB_gameboy_t gb;
 static bool paused = false;
 static uint32_t pixel_buffer_1[256 * 224], pixel_buffer_2[256 * 224];
@@ -424,12 +428,39 @@ static bool handle_pending_command(void)
     return false;
 }
 
+void unique_iteration() {
+  if (paused || rewind_paused) {
+      SDL_WaitEvent(NULL);
+      handle_events(&gb);
+  }
+  else {
+      if (do_rewind) {
+          GB_rewind_pop(&gb);
+          if (turbo_down) {
+              GB_rewind_pop(&gb);
+          }
+          if (!GB_rewind_pop(&gb)) {
+              rewind_paused = true;
+          }
+          do_rewind = false;
+      }
+      GB_run(&gb);
+  }
+  
+  /* These commands can't run in the handle_event function, because they're not safe in a vblank context. */
+  if (handle_pending_command()) {
+      pending_command = GB_SDL_NO_COMMAND;
+      // goto restart;
+  }
+  pending_command = GB_SDL_NO_COMMAND;
+}
+
 static void run(void)
 {
     SDL_ShowCursor(SDL_DISABLE);
     GB_model_t model;
     pending_command = GB_SDL_NO_COMMAND;
-restart:
+// restart:
     model = (GB_model_t [])
     {
         [MODEL_DMG] = GB_MODEL_DMG_B,
@@ -467,6 +498,8 @@ restart:
     SDL_SetWindowMinimumSize(window, GB_get_screen_width(&gb), GB_get_screen_height(&gb));
 
     
+    
+    
     bool error = false;
     start_capturing_logs();
     const char * const boot_roms[] = {"dmg_boot.bin", "cgb_boot.bin", "agb_boot.bin", "sgb_boot.bin"};
@@ -499,32 +532,16 @@ restart:
     update_viewport();
 
     /* Run emulation */
-    while (true) {
-        if (paused || rewind_paused) {
-            SDL_WaitEvent(NULL);
-            handle_events(&gb);
-        }
-        else {
-            if (do_rewind) {
-                GB_rewind_pop(&gb);
-                if (turbo_down) {
-                    GB_rewind_pop(&gb);
-                }
-                if (!GB_rewind_pop(&gb)) {
-                    rewind_paused = true;
-                }
-                do_rewind = false;
-            }
-            GB_run(&gb);
-        }
-        
-        /* These commands can't run in the handle_event function, because they're not safe in a vblank context. */
-        if (handle_pending_command()) {
-            pending_command = GB_SDL_NO_COMMAND;
-            goto restart;
-        }
-        pending_command = GB_SDL_NO_COMMAND;
-    }
+    #ifdef __EMSCRIPTEN__
+      // void emscripten_set_main_loop(em_callback_func func, int fps, int simulate_infinite_loop);
+      printf("setting emscripten main loop \n");
+      emscripten_set_main_loop(unique_iteration, 60, 1);
+    #else
+      printf("setting main SDL loop \n");
+      while (true) {
+        unique_iteration();
+      }
+    #endif
 }
 
 static char prefs_path[1024] = {0, };
@@ -586,18 +603,11 @@ int main(int argc, char **argv)
         SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     }
     
-    SDL_GLContext gl_context = SDL_GL_CreateContext(window);
-    
-    GLint major = 0, minor = 0;
-    glGetIntegerv(GL_MAJOR_VERSION, &major);
-    glGetIntegerv(GL_MINOR_VERSION, &minor);
-    
-    if (major * 0x100 + minor < 0x302) {
-        SDL_GL_DeleteContext(gl_context);
-        gl_context = NULL;
-    }
+    SDL_GLContext gl_context = NULL;
     
     if (gl_context == NULL) {
+        printf("gl_context is null\n");
+      
         renderer = SDL_CreateRenderer(window, -1, 0);
         texture = SDL_CreateTexture(renderer, SDL_GetWindowPixelFormat(window), SDL_TEXTUREACCESS_STREAMING, 160, 144);
         pixel_format = SDL_AllocFormat(SDL_GetWindowPixelFormat(window));
@@ -606,13 +616,12 @@ int main(int argc, char **argv)
         pixel_format = SDL_AllocFormat(SDL_PIXELFORMAT_ABGR8888);
     }
     
-    
     /* Configure Audio */
     memset(&want_aspec, 0, sizeof(want_aspec));
     want_aspec.freq = AUDIO_FREQUENCY;
     want_aspec.format = AUDIO_S16SYS;
     want_aspec.channels = 2;
-    want_aspec.samples = 512;
+    want_aspec.samples = 512;    
     
     SDL_version _sdl_version;
     SDL_GetVersion(&_sdl_version);
@@ -652,9 +661,11 @@ int main(int argc, char **argv)
     
     atexit(save_configuration);
     
-    if (!init_shader_with_name(&shader, configuration.filter)) {
-        init_shader_with_name(&shader, "NearestNeighbor");
-    }
+    // if (!init_shader_with_name(&shader, configuration.filter)) {
+    //     init_shader_with_name(&shader, "NearestNeighbor");
+    // }
+    
+    
     update_viewport();
     
     if (filename == NULL) {
@@ -663,6 +674,10 @@ int main(int argc, char **argv)
     else {
         connect_joypad();
     }
+    
+    
+
+    
     SDL_PauseAudioDevice(device_id, 0);
     run(); // Never returns
     return 0;

@@ -20,7 +20,5 @@ SOURCES_C   := $(CORE_DIR)/Core/gb.c \
                $(CORE_DIR)/libretro/sgb2_boot.c \
                $(CORE_DIR)/libretro/libretro.c
 
-CFLAGS += -DDISABLE_TIMEKEEPING -DDISABLE_REWIND -DDISABLE_DEBUGGER
-
 
 SOURCES_CXX :=	

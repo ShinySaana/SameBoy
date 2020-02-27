@@ -39,6 +39,7 @@ export VERSION
 CONF ?= debug
 
 BIN := build/bin
+LIB := build/lib
 OBJ := build/obj
 BOOTROMS_DIR ?= $(BIN)/BootROMs
 
@@ -75,7 +76,7 @@ endif
 
 # Set compilation and linkage flags based on target, platform and configuration
 
-OPEN_DIALOG = OpenDialog/gtk.c
+OPEN_DIALOG = OpenDialog/none.c
 NULL := /dev/null
 
 ifeq ($(PLATFORM),windows32)
@@ -158,6 +159,8 @@ quicklook: $(BIN)/SameBoy.qlgenerator
 sdl: $(SDL_TARGET) $(BIN)/SDL/dmg_boot.bin $(BIN)/SDL/cgb_boot.bin $(BIN)/SDL/agb_boot.bin $(BIN)/SDL/sgb_boot.bin $(BIN)/SDL/sgb2_boot.bin $(BIN)/SDL/LICENSE $(BIN)/SDL/registers.sym $(BIN)/SDL/background.bmp $(BIN)/SDL/Shaders
 bootroms: $(BIN)/BootROMs/agb_boot.bin $(BIN)/BootROMs/cgb_boot.bin $(BIN)/BootROMs/dmg_boot.bin $(BIN)/BootROMs/sgb_boot.bin $(BIN)/BootROMs/sgb2_boot.bin
 tester: $(TESTER_TARGET) $(BIN)/tester/dmg_boot.bin $(BIN)/tester/cgb_boot.bin $(BIN)/tester/agb_boot.bin $(BIN)/tester/sgb_boot.bin $(BIN)/tester/sgb2_boot.bin
+libwasm: $(LIB)/libsameboy.wasm
+sdlhtml: $(BIN)/sameboy.html
 all: cocoa sdl tester libretro
 
 # Get a list of our source files and their respective object file targets
@@ -383,6 +386,21 @@ $(BIN)/BootROMs/%.bin: BootROMs/%.asm $(OBJ)/BootROMs/SameBoyLogo.pb8
 # Libretro Core (uses its own build system)
 libretro:
 	$(MAKE) -C libretro
+	
+# Libwasm Core
+
+$(LIB)/libsameboy.wasm: CFLAGS += -s WASM=0 -s LINKABLE=1 -s EXPORT_ALL=1
+
+$(LIB)/libsameboy.wasm: $(CORE_OBJECTS)
+	-@$(MKDIR) -p $(dir $@)
+	$(CC) $(CFLAGS) $^ -o $(LIB)/libsameboy.html
+
+
+$(BIN)/sameboy.html: CFLAGS += -s WASM=0 -s LINKABLE=1 -s EXPORT_ALL=1 -s USE_SDL=2
+
+$(BIN)/sameboy.html: $(CORE_OBJECTS) $(SDL_OBJECTS)
+	-@$(MKDIR) -p $(dir $@)
+	$(CC) $^ -o $@ $(CFLAGS)
 
 # Clean
 clean:

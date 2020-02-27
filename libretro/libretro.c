@@ -1211,3 +1211,72 @@ void retro_cheat_set(unsigned index, bool enabled, const char *code)
     (void)code;
 }
 
+
+
+static uint32_t *image_data_buffer = NULL;
+
+// https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
+static inline uint32_t rotr32 (uint32_t n, unsigned int c)
+{
+  const unsigned int mask = (CHAR_BIT*sizeof(n) - 1);
+  c &= mask;
+  return (n>>c) | (n<<( (-c)&mask ));
+}
+
+void shift_pixels(uint32_t *ptr, size_t length) {
+  for (size_t i = 0; i < length; i++) {
+    ptr[i] = rotr32(ptr[i], 8);
+  }
+}
+
+void set_opaque(uint32_t *ptr, size_t length) {
+  for (size_t i = 0; i < length; i++) {
+    ptr[i] = ptr[i] | 0xff000000;
+  }
+}
+
+uint32_t* test_init_frame_buffer() {
+  frame_buf = (uint32_t*)malloc(SGB_VIDEO_PIXELS * sizeof(uint32_t));
+  memset(frame_buf, 0, SGB_VIDEO_PIXELS * sizeof(uint32_t));
+  
+  size_t count = SGB_VIDEO_PIXELS * sizeof(uint32_t);
+  uint8_t* frame_buf_u8 = (uint8_t*) frame_buf;
+  
+  for (size_t i = 0; i < count; i++) {
+if (i % 4 == 3) {
+      frame_buf_u8[i] = 255;
+    }
+  }
+  
+  return frame_buf;
+}
+
+// length is in u8, since it will be passed in u8 in video_refresh
+uint32_t* frame_buffer_to_image_data(uint32_t* ptr, size_t length) {
+  if (image_data_buffer == NULL) {
+    image_data_buffer = (uint32_t*) malloc(length);
+    memset(image_data_buffer, 39, length);
+  }
+  
+  memcpy(image_data_buffer, ptr, length);
+  
+  shift_pixels(image_data_buffer, length / 4);
+  set_opaque(image_data_buffer, length / 4);
+  
+  return image_data_buffer;
+}
+
+void refresh_image() {
+    video_cb(frame_buf, VIDEO_WIDTH, VIDEO_HEIGHT, VIDEO_WIDTH * sizeof(uint32_t));
+}
+
+
+void call_a_callback(void (*callback)(void)) {
+  printf("Calling callback...\n");
+  callback();
+  printf("Callback called.\n");  
+}
+
+void try_logger() {
+  log_cb(RETRO_LOG_INFO, "logging something: %x", 394);
+}

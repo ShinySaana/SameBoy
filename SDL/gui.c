@@ -821,6 +821,7 @@ void run_gui(bool is_running)
         }
     }
     
+    
     SDL_Event event = {0,};
     gui_state = is_running? SHOWING_MENU : SHOWING_DROP_MESSAGE;
     bool should_render = true;
@@ -1202,5 +1203,5 @@ void run_gui(bool is_running)
             render_texture(pixels, NULL);
 #endif
         }
-    } while (SDL_WaitEvent(&event));
+    } while (printf("waiting\n"), SDL_WaitEvent(&event));
 }

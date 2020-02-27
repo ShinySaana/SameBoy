@@ -1,3 +1,8 @@
+# WASM stuff
+
+
+# CFLAGS += -s WASM=1 -s LINKABLE=1 -s EXPORT_ALL=1
+
 STATIC_LINKING := 0
 AR             := ar
 
