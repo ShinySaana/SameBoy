@@ -1271,12 +1271,55 @@ void refresh_image() {
 }
 
 
+// struct retro_game_info
+// {
+//    const char *path;       /* Path to game, UTF-8 encoded.
+//                             * Usually used as a reference.
+//                             * May be NULL if rom was loaded from stdin
+//                             * or similar. 
+//                             * retro_system_info::need_fullpath guaranteed 
+//                             * that this path is valid. */
+//    const void *data;       /* Memory buffer of loaded game. Will be NULL 
+//                             * if need_fullpath was set. */
+//    size_t      size;       /* Size of memory buffer. */
+//    const char *meta;       /* String of implementation specific meta-data. */
+// };
+
+
+typedef struct retro_game_info retro_game_info;
+
+retro_game_info* retroh_new_game_info() {
+  retro_game_info* ptr = (retro_game_info*) malloc(sizeof(retro_game_info));
+  memset(ptr, 0, sizeof(retro_game_info));
+  return ptr;
+}
+
+const char* retroh_get_game_info_path(retro_game_info* game_info) {
+  return game_info->path;
+}
+
+void retroh_set_game_info_path(retro_game_info* game_info, const char* path) {
+  game_info->path = path;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 void call_a_callback(void (*callback)(void)) {
   printf("Calling callback...\n");
   callback();
   printf("Callback called.\n");  
 }
 
-void try_logger() {
-  log_cb(RETRO_LOG_INFO, "logging something: %x", 394);
+void try_logger(char* data) {
+  log_cb(RETRO_LOG_INFO, "logging something: %s", data);
 }
