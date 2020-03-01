@@ -1244,10 +1244,7 @@ void set_opaque(uint32_t *ptr, size_t length) {
 
 uint32_t* test_init_frame_buffer() {
   frame_buf = (uint32_t*)malloc(SGB_VIDEO_PIXELS * sizeof(uint32_t));
-  memset(frame_buf, 0, SGB_VIDEO_PIXELS * sizeof(uint32_t));
-  
-  size_t count = SGB_VIDEO_PIXELS * sizeof(uint32_t);
-  
+  memset(frame_buf, 0, SGB_VIDEO_PIXELS * sizeof(uint32_t));  
   return frame_buf;
 }
 
@@ -1258,7 +1255,7 @@ uint32_t* frame_buffer_to_image_data(uint32_t* ptr, size_t length) {
     memset(image_data_buffer, 0, length);
   }
   
-  memcpy(image_data_buffer, ptr, length);*
+  memcpy(image_data_buffer, ptr, length);
   
   set_opaque(image_data_buffer, length / 4);
   
@@ -1332,8 +1329,8 @@ void retroh_set_rumble_interface_set_rumble_state(
 
 
 void retroh_gb_set_input_callback(GB_input_callback_t input_callback) {
-  GB_set_input_callback(&gameboy[0], input_callback);
-  GB_set_async_input_callback(&gameboy[0], input_callback);
+  GB_set_input_callback(&gameboy[0], NULL);
+  GB_set_async_input_callback(&gameboy[0], NULL);
 }
 
 
