@@ -366,6 +366,8 @@ $(OBJ)/%.1bpp: %.png
 	-@$(MKDIR) -p $(dir $@)
 	rgbgfx -d 1 -h -o $@ $<
 
+$(PB8_COMPRESS): CC = clang
+
 $(OBJ)/BootROMs/SameBoyLogo.pb8: $(OBJ)/BootROMs/SameBoyLogo.1bpp $(PB8_COMPRESS)
 	$(realpath $(PB8_COMPRESS)) -l 384 $< $@
 

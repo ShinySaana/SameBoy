@@ -142,10 +142,10 @@ static void GB_update_keys_status(GB_gameboy_t *gb, unsigned port)
     GB_set_key_state_for_player(gb, GB_KEY_START,  emulated_devices == 1 ? port : 0,
         input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START));
 
-    if (gb->rumble_state)
-        rumble.set_rumble_state(port, RETRO_RUMBLE_STRONG, 65535);
-    else
-        rumble.set_rumble_state(port, RETRO_RUMBLE_STRONG, 0);
+    // if (gb->rumble_state)
+    //     rumble.set_rumble_state(port, RETRO_RUMBLE_STRONG, 65535);
+    // else
+    //     rumble.set_rumble_state(port, RETRO_RUMBLE_STRONG, 0);
 }
 
 
@@ -1213,6 +1213,13 @@ void retro_cheat_set(unsigned index, bool enabled, const char *code)
 
 
 
+
+
+
+
+
+
+
 static uint32_t *image_data_buffer = NULL;
 
 // https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
@@ -1240,13 +1247,6 @@ uint32_t* test_init_frame_buffer() {
   memset(frame_buf, 0, SGB_VIDEO_PIXELS * sizeof(uint32_t));
   
   size_t count = SGB_VIDEO_PIXELS * sizeof(uint32_t);
-  uint8_t* frame_buf_u8 = (uint8_t*) frame_buf;
-  
-  for (size_t i = 0; i < count; i++) {
-if (i % 4 == 3) {
-      frame_buf_u8[i] = 255;
-    }
-  }
   
   return frame_buf;
 }
@@ -1255,12 +1255,11 @@ if (i % 4 == 3) {
 uint32_t* frame_buffer_to_image_data(uint32_t* ptr, size_t length) {
   if (image_data_buffer == NULL) {
     image_data_buffer = (uint32_t*) malloc(length);
-    memset(image_data_buffer, 39, length);
+    memset(image_data_buffer, 0, length);
   }
   
-  memcpy(image_data_buffer, ptr, length);
+  memcpy(image_data_buffer, ptr, length);*
   
-  shift_pixels(image_data_buffer, length / 4);
   set_opaque(image_data_buffer, length / 4);
   
   return image_data_buffer;
@@ -1303,15 +1302,39 @@ void retroh_set_game_info_path(retro_game_info* game_info, const char* path) {
 }
 
 
+// struct retro_rumble_interface
+// {
+//    retro_set_rumble_state_t set_rumble_state;
+// };
+
+typedef struct retro_rumble_interface retro_rumble_interface;
+
+retro_rumble_interface* retroh_new_rumble_interface() {
+  retro_rumble_interface* ptr = (retro_rumble_interface*) malloc(sizeof(retro_rumble_interface));
+  memset(ptr, 0, sizeof(retro_rumble_interface));
+  return ptr;
+}
+
+
+retro_set_rumble_state_t retroh_get_rumble_interface_set_rumble_state(
+  retro_rumble_interface* rumble_interface
+) {
+  return rumble_interface->set_rumble_state;
+}
+
+void retroh_set_rumble_interface_set_rumble_state(
+  retro_rumble_interface* rumble_interface,
+  retro_set_rumble_state_t set_rumble_state
+) {
+  rumble_interface->set_rumble_state = set_rumble_state;
+}
 
 
 
-
-
-
-
-
-
+void retroh_gb_set_input_callback(GB_input_callback_t input_callback) {
+  GB_set_input_callback(&gameboy[0], input_callback);
+  GB_set_async_input_callback(&gameboy[0], input_callback);
+}
 
 
 void call_a_callback(void (*callback)(void)) {
