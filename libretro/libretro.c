@@ -1330,7 +1330,26 @@ void retroh_set_rumble_interface_set_rumble_state(
 
 void retroh_gb_set_input_callback(GB_input_callback_t input_callback) {
   GB_set_input_callback(&gameboy[0], NULL);
-  GB_set_async_input_callback(&gameboy[0], NULL);
+  GB_set_async_input_callback(&gameboy[0], input_callback);
+}
+
+
+void retroh_gb_load_battery(char* path) {
+  GB_load_battery(&gameboy[0], path); 
+}
+
+void retroh_set_main_loop() {
+  #ifdef __EMSCRIPTEN__
+  #include "emscripten.h"
+  emscripten_set_main_loop(retro_run, 60, 1);
+  #endif
+}
+
+void retroh_cancel_main_loop() {
+  #ifdef __EMSCRIPTEN__
+  #include "emscripten.h"
+  emscripten_cancel_main_loop();
+  #endif
 }
 
 
