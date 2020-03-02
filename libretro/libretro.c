@@ -127,18 +127,25 @@ static void GB_update_keys_status(GB_gameboy_t *gb, unsigned port)
 
     GB_set_key_state_for_player(gb, GB_KEY_RIGHT,  emulated_devices == 1 ? port : 0,
         input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT));
+        
     GB_set_key_state_for_player(gb, GB_KEY_LEFT,   emulated_devices == 1 ? port : 0,
         input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT));
+        
     GB_set_key_state_for_player(gb, GB_KEY_UP,     emulated_devices == 1 ? port : 0,
         input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP));
+        
     GB_set_key_state_for_player(gb, GB_KEY_DOWN,   emulated_devices == 1 ? port : 0,
         input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN));
+        
     GB_set_key_state_for_player(gb, GB_KEY_A,      emulated_devices == 1 ? port : 0,
         input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A));
+        
     GB_set_key_state_for_player(gb, GB_KEY_B,      emulated_devices == 1 ? port : 0,
         input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B));
+        
     GB_set_key_state_for_player(gb, GB_KEY_SELECT, emulated_devices == 1 ? port : 0,
         input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT));
+        
     GB_set_key_state_for_player(gb, GB_KEY_START,  emulated_devices == 1 ? port : 0,
         input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START));
 
