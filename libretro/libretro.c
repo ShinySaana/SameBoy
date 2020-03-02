@@ -351,10 +351,7 @@ static void init_for_current_model(unsigned id)
     unsigned i = id;
     enum model effective_model;
 
-    effective_model = model[i];
-    if (effective_model == MODEL_AUTO) {
-        effective_model = auto_model;
-    }
+    effective_model = 1;
 
 
     if (GB_is_inited(&gameboy[i])) {
@@ -1230,6 +1227,13 @@ void retro_cheat_set(unsigned index, bool enabled, const char *code)
 static uint32_t *image_data_buffer = NULL;
 
 // https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
+static inline uint32_t rotl32 (uint32_t n, unsigned int c)
+{
+  const unsigned int mask = (CHAR_BIT*sizeof(n) - 1);
+  c &= mask;
+  return (n<<c) | (n>>( (-c)&mask ));
+}
+
 static inline uint32_t rotr32 (uint32_t n, unsigned int c)
 {
   const unsigned int mask = (CHAR_BIT*sizeof(n) - 1);
@@ -1239,13 +1243,25 @@ static inline uint32_t rotr32 (uint32_t n, unsigned int c)
 
 void shift_pixels(uint32_t *ptr, size_t length) {
   for (size_t i = 0; i < length; i++) {
-    ptr[i] = rotr32(ptr[i], 8);
+    ptr[i] = rotl32(ptr[i], 8);
   }
 }
 
 void set_opaque(uint32_t *ptr, size_t length) {
   for (size_t i = 0; i < length; i++) {
-    ptr[i] = ptr[i] | 0xff000000;
+    ptr[i] = ptr[i] | 0xFF000000;  
+  }
+}
+
+void swap_pixels(uint8_t *ptr, size_t length) {
+  for (size_t i = 0; i < length; i = i + 4) {
+    uint8_t temp = ptr[i];
+    ptr[i] = ptr[i + 3];
+    ptr[i + 3] = temp;
+    
+    uint8_t temp2 = ptr[i + 1];
+    ptr[i + 1] = ptr[i + 2];
+    ptr[i + 2] = temp2;
   }
 }
 
@@ -1265,6 +1281,9 @@ uint32_t* frame_buffer_to_image_data(uint32_t* ptr, size_t length) {
   memcpy(image_data_buffer, ptr, length);
   
   set_opaque(image_data_buffer, length / 4);
+  shift_pixels(image_data_buffer, length / 4);
+  swap_pixels((uint8_t*) image_data_buffer, length);
+  
   
   return image_data_buffer;
 }
