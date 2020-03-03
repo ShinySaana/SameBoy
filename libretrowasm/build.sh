@@ -7,12 +7,7 @@ cd ..
 # clean build directory
 make clean
 
-# make the bootroms
-# requires clang and not emcc
-make bootroms
-
 cd -
-
 cd ../libretro/
 # make wasm libretro core object files
 emmake make
@@ -23,8 +18,6 @@ mkdir -p ./obj
 cp ../build/libretro/*.o ./obj
 cp ../build/Core/*.o ./obj
 
-mkdir -p ./bootroms
-cp ../build/bin/BootROMs/*.bin ./bootroms
 
 # link statically the object files
 mkdir -p ./build
