@@ -85,6 +85,7 @@ static retro_log_printf_t log_cb;
 
 static retro_video_refresh_t video_cb;
 static retro_audio_sample_t audio_sample_cb;
+static retro_audio_sample_batch_t audio_sample_batch_cb;
 static retro_input_poll_t input_poll_cb;
 static retro_input_state_t input_state_cb;
 
@@ -156,11 +157,26 @@ static void GB_update_keys_status(GB_gameboy_t *gb, unsigned port)
 }
 
 
+#define AUDIO_BATCH_SIZE 4800
+#define AUDIO_BATCH_SIZE_HALF 2400
+
+int16_t* batch;
+size_t audio_batch_advance = 0;
+
 static void audio_callback(GB_gameboy_t *gb, GB_sample_t *sample)
 {
     if ((audio_out == GB_1 && gb == &gameboy[0]) ||
         (audio_out == GB_2 && gb == &gameboy[1])) {
-            audio_sample_cb(sample->left, sample->right);
+          
+          batch[audio_batch_advance] = sample->left;
+          batch[audio_batch_advance + AUDIO_BATCH_SIZE_HALF] = sample->right;
+          
+          audio_batch_advance++;
+          
+          if (audio_batch_advance >= AUDIO_BATCH_SIZE_HALF) {
+            audio_batch_advance = 0;
+            audio_sample_batch_cb(batch, AUDIO_BATCH_SIZE);
+          }
     }
 }
 
@@ -800,6 +816,9 @@ void retro_set_audio_sample(retro_audio_sample_t cb)
 
 void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb)
 {
+  batch = (int16_t*) malloc(sizeof(int16_t) * AUDIO_BATCH_SIZE);
+  memset(batch, 0, sizeof(int16_t) * AUDIO_BATCH_SIZE);
+  audio_sample_batch_cb = cb;
 }
 
 void retro_set_input_poll(retro_input_poll_t cb)
