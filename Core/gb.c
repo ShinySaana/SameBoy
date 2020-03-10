@@ -113,8 +113,8 @@ void GB_init(GB_gameboy_t *gb, GB_model_t model)
     }
 
 #ifndef DISABLE_DEBUGGER
-    gb->input_callback = default_input_callback;
-    gb->async_input_callback = default_async_input_callback;
+    // gb->input_callback = default_input_callback;
+    // gb->async_input_callback = default_async_input_callback;
 #endif
     gb->cartridge_type = &GB_cart_defs[0]; // Default cartridge type
     gb->clock_multiplier = 1.0;
@@ -559,9 +559,9 @@ void GB_set_log_callback(GB_gameboy_t *gb, GB_log_callback_t callback)
 void GB_set_input_callback(GB_gameboy_t *gb, GB_input_callback_t callback)
 {
 #ifndef DISABLE_DEBUGGER
-    if (gb->input_callback == default_input_callback) {
-        gb->async_input_callback = NULL;
-    }
+    // if (gb->input_callback == default_input_callback) {
+    //     gb->async_input_callback = NULL;
+    // }
     gb->input_callback = callback;
 #endif
 }

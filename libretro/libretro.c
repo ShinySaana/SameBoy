@@ -1373,9 +1373,9 @@ void retroh_set_rumble_interface_set_rumble_state(
 
 
 
-void retroh_gb_set_input_callback(GB_input_callback_t input_callback) {
-  GB_set_input_callback(&gameboy[0], NULL);
-  GB_set_async_input_callback(&gameboy[0], input_callback);
+void retroh_gb_set_input_callback(GB_input_callback_t async_input_callback) {
+  GB_set_input_callback(&gameboy[0], async_input_callback);
+  GB_set_async_input_callback(&gameboy[0], async_input_callback);
 }
 
 
@@ -1397,13 +1397,6 @@ void retroh_cancel_main_loop() {
   #endif
 }
 
-
-void call_a_callback(void (*callback)(void)) {
-  printf("Calling callback...\n");
-  callback();
-  printf("Callback called.\n");  
-}
-
-void try_logger(char* data) {
-  log_cb(RETRO_LOG_INFO, "logging something: %s", data);
+void retroh_set_gb_log(GB_log_callback_t callback) {
+  GB_set_log_callback(&gameboy[0], callback);
 }
