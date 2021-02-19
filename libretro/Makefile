@@ -1,4 +1,4 @@
-STATIC_LINKING := 0
+STATIC_LINKING := 1
 AR             := ar
 
 CFLAGS := -Wall $(CFLAGS)
