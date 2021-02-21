@@ -617,6 +617,7 @@ static void check_variables()
                 new_model = MODEL_DMG;
             }
             else if (strcmp(var.value, "Game Boy Color") == 0) {
+                printf("Game Boy Color selected\n");
                 new_model = MODEL_CGB;
             }
             else if (strcmp(var.value, "Game Boy Advance") == 0) {
@@ -853,6 +854,7 @@ void retro_init(void)
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &dir) && dir) {
         snprintf(retro_system_directory, sizeof(retro_system_directory), "%s", dir);
+        printf("Got system directory: %s\n", retro_system_directory);
     }
     else {
         snprintf(retro_system_directory, sizeof(retro_system_directory), "%s", ".");
@@ -860,6 +862,7 @@ void retro_init(void)
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY, &dir) && dir) {
         snprintf(retro_save_directory, sizeof(retro_save_directory), "%s", dir);
+        printf("Got save directory: %s\n", retro_save_directory);
     }
     else {
         snprintf(retro_save_directory, sizeof(retro_save_directory), "%s", ".");
@@ -1008,6 +1011,8 @@ void retro_run(void)
         check_variables();
     }
 
+    
+
     if (emulated_devices == 2) { 
         GB_update_keys_status(&gameboy[0], 0);
         GB_update_keys_status(&gameboy[1], 1);
@@ -1082,6 +1087,8 @@ bool retro_load_game(const struct retro_game_info *info)
         log_cb(RETRO_LOG_INFO, "XRGB8888 is not supported\n");
         return false;
     }
+
+    printf("Pixel format set: %d\n", fmt);
 
     auto_model = (info->path[strlen(info->path) - 1] & ~0x20) == 'C' ? MODEL_CGB : MODEL_DMG;
     snprintf(retro_game_path, sizeof(retro_game_path), "%s", info->path);
