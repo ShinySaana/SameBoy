@@ -2746,7 +2746,7 @@ RETRO_API void *retro_get_memory_data(unsigned id);
 RETRO_API size_t retro_get_memory_size(unsigned id);
 
 
-RETRO_API void emuka_testprint(void);
+RETRO_API void emuka_save_battery(const char *path);
 
 
 #ifdef __cplusplus

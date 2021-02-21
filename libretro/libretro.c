@@ -1397,6 +1397,6 @@ void retro_cheat_set(unsigned index, bool enabled, const char *code)
     (void)code;
 }
 
-void emuka_testprint(void) {
-    printf("Emuka from C");
+void emuka_save_battery(const char *path) {
+    GB_save_battery(&gameboy[0], path);
 }
