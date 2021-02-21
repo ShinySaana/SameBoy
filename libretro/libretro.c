@@ -96,6 +96,8 @@ static bool geometry_updated = false;
 static bool link_cable_emulation = false;
 /*static bool infrared_emulation   = false;*/
 
+static unsigned audio_frequency = AUDIO_FREQUENCY;
+
 signed short soundbuf[1024 * 2];
 
 char retro_system_directory[4096];
@@ -512,7 +514,7 @@ static void init_for_current_model(unsigned id)
     GB_set_pixels_output(&gameboy[i],
                          (uint32_t *)(frame_buf + GB_get_screen_width(&gameboy[0]) * GB_get_screen_height(&gameboy[0]) * i));
     GB_set_rgb_encode_callback(&gameboy[i], rgb_encode);
-    GB_set_sample_rate(&gameboy[i], AUDIO_FREQUENCY);
+    GB_set_sample_rate(&gameboy[i], audio_frequency);
     GB_apu_set_sample_callback(&gameboy[i], audio_callback);
     GB_set_rumble_callback(&gameboy[i], rumble_callback);
 
@@ -1399,4 +1401,8 @@ void retro_cheat_set(unsigned index, bool enabled, const char *code)
 
 void emuka_save_battery(const char *path) {
     GB_save_battery(&gameboy[0], path);
+}
+
+void emuka_set_audio_frequency(unsigned frequency) {
+    audio_frequency = frequency;
 }
