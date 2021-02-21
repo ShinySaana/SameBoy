@@ -878,6 +878,7 @@ void retro_init(void)
     }
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL)) {
+        printf("Supports input bitmask\n");
         libretro_supports_bitmasks = true;
     }
 }
@@ -1397,6 +1398,10 @@ void retro_cheat_set(unsigned index, bool enabled, const char *code)
     (void)index;
     (void)enabled;
     (void)code;
+}
+
+void emuka_load_battery(const char *path) {
+    GB_load_battery(&gameboy[0], path);
 }
 
 void emuka_save_battery(const char *path) {
