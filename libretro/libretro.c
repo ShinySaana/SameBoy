@@ -140,6 +140,10 @@ static void GB_update_keys_status(GB_gameboy_t *gb, unsigned port)
         }
     }
 
+    if (joypad_bits) {
+        printf("Joypad bits: %x\n", joypad_bits);
+    }
+
     GB_set_key_state_for_player(gb, GB_KEY_RIGHT,  emulated_devices == 1 ? port : 0,
         joypad_bits & (1 << RETRO_DEVICE_ID_JOYPAD_RIGHT));
     GB_set_key_state_for_player(gb, GB_KEY_LEFT,   emulated_devices == 1 ? port : 0,
