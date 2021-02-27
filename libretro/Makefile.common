@@ -17,6 +17,8 @@ SOURCES_C   := $(CORE_DIR)/Core/gb.c \
                $(CORE_DIR)/Core/random.c \
                $(CORE_DIR)/Core/rumble.c \
                $(CORE_DIR)/Core/debugger.c \
+               $(CORE_DIR)/Core/cheats.c \
+               $(CORE_DIR)/Core/rewind.c \
                $(CORE_DIR)/Core/sm83_disassembler.c \
                $(CORE_DIR)/libretro/agb_boot.c \
                $(CORE_DIR)/libretro/cgb_boot.c \
@@ -25,7 +27,7 @@ SOURCES_C   := $(CORE_DIR)/Core/gb.c \
                $(CORE_DIR)/libretro/sgb2_boot.c \
                $(CORE_DIR)/libretro/libretro.c
 
-CFLAGS += -DGB_INTERNAL
+CFLAGS += -DGB_INTERNAL -DDISABLE_CHEATS -DDISABLE_REWIND
 
 
 SOURCES_CXX :=	
