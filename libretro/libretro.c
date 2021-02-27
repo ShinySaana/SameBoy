@@ -619,7 +619,6 @@ static void check_variables()
                 new_model = MODEL_DMG;
             }
             else if (strcmp(var.value, "Game Boy Color") == 0) {
-                printf("Game Boy Color selected\n");
                 new_model = MODEL_CGB;
             }
             else if (strcmp(var.value, "Game Boy Advance") == 0) {
@@ -856,7 +855,6 @@ void retro_init(void)
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &dir) && dir) {
         snprintf(retro_system_directory, sizeof(retro_system_directory), "%s", dir);
-        printf("Got system directory: %s\n", retro_system_directory);
     }
     else {
         snprintf(retro_system_directory, sizeof(retro_system_directory), "%s", ".");
@@ -864,7 +862,6 @@ void retro_init(void)
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY, &dir) && dir) {
         snprintf(retro_save_directory, sizeof(retro_save_directory), "%s", dir);
-        printf("Got save directory: %s\n", retro_save_directory);
     }
     else {
         snprintf(retro_save_directory, sizeof(retro_save_directory), "%s", ".");
@@ -878,7 +875,6 @@ void retro_init(void)
     }
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL)) {
-        printf("Supports input bitmask\n");
         libretro_supports_bitmasks = true;
     }
 }
@@ -919,7 +915,7 @@ void retro_get_system_info(struct retro_system_info *info)
 void retro_get_system_av_info(struct retro_system_av_info *info)
 {
     struct retro_game_geometry geom;
-    struct retro_system_timing timing = { GB_get_usual_frame_rate(&gameboy[0]), AUDIO_FREQUENCY };
+    struct retro_system_timing timing = { GB_get_usual_frame_rate(&gameboy[0]), audio_frequency };
 
     if (emulated_devices == 2) { 
         if (screen_layout == LAYOUT_TOP_DOWN) {
@@ -1090,8 +1086,6 @@ bool retro_load_game(const struct retro_game_info *info)
         log_cb(RETRO_LOG_INFO, "XRGB8888 is not supported\n");
         return false;
     }
-
-    printf("Pixel format set: %d\n", fmt);
 
     auto_model = (info->path[strlen(info->path) - 1] & ~0x20) == 'C' ? MODEL_CGB : MODEL_DMG;
     snprintf(retro_game_path, sizeof(retro_game_path), "%s", info->path);
@@ -1411,3 +1405,9 @@ void emuka_save_battery(const char *path) {
 void emuka_set_audio_frequency(unsigned frequency) {
     audio_frequency = frequency;
 }
+
+bool emuka_read_remory() {
+    return GB_debugger_is_stopped(&gameboy[0]);
+}
+
+
