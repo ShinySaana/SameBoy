@@ -237,8 +237,13 @@ static void infraredStateChanged(GB_gameboy_t *gb, bool on)
         case MODEL_CGB:
             return (GB_model_t)[[NSUserDefaults standardUserDefaults] integerForKey:@"GBCGBModel"];
             
-        case MODEL_SGB:
-            return (GB_model_t)[[NSUserDefaults standardUserDefaults] integerForKey:@"GBSGBModel"];
+        case MODEL_SGB: {
+            GB_model_t model = (GB_model_t)[[NSUserDefaults standardUserDefaults] integerForKey:@"GBSGBModel"];
+            if (model == (GB_MODEL_SGB | GB_MODEL_PAL_BIT_OLD)) {
+                model = GB_MODEL_SGB_PAL;
+            }
+            return model;
+        }
         
         case MODEL_AGB:
             return GB_MODEL_AGB;
@@ -295,6 +300,7 @@ static void infraredStateChanged(GB_gameboy_t *gb, bool on)
     GB_set_camera_update_request_callback(&gb, cameraRequestUpdate);
     GB_set_highpass_filter_mode(&gb, (GB_highpass_mode_t) [[NSUserDefaults standardUserDefaults] integerForKey:@"GBHighpassFilter"]);
     GB_set_rewind_length(&gb, [[NSUserDefaults standardUserDefaults] integerForKey:@"GBRewindLength"]);
+    GB_set_rtc_mode(&gb, [[NSUserDefaults standardUserDefaults] integerForKey:@"GBRTCMode"]);
     GB_apu_set_sample_callback(&gb, audioCallback);
     GB_set_rumble_callback(&gb, rumbleCallback);
     GB_set_infrared_callback(&gb, infraredStateChanged);
@@ -727,6 +733,12 @@ static unsigned *multiplication_table_for_frequency(unsigned frequency)
                                                object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(updateRTCMode)
+                                                 name:@"GBRTCModeChanged"
+                                               object:nil];
+
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(dmgModelChanged)
                                                  name:@"GBDMGModelChanged"
                                                object:nil];
@@ -853,6 +865,10 @@ static unsigned *multiplication_table_for_frequency(unsigned frequency)
     [[NSUserDefaults standardUserDefaults] setInteger:self.mainWindow.frame.size.height forKey:@"LastWindowHeight"];
     [self stop];
     [self.consoleWindow close];
+    [self.memoryWindow close];
+    [self.vramWindow close];
+    [self.printerFeedWindow close];
+    [self.cheatsWindow close];
     [super close];
 }
 
@@ -1105,7 +1121,9 @@ static unsigned *multiplication_table_for_frequency(unsigned frequency)
 
 - (char *) getDebuggerInput
 {
+    [audioLock lock];
     [audioLock signal];
+    [audioLock unlock];
     [self updateSideView];
     [self log:">"];
     in_sync_input = true;
@@ -1874,6 +1892,13 @@ static unsigned *multiplication_table_for_frequency(unsigned frequency)
             GB_set_rewind_length(&gb, [[NSUserDefaults standardUserDefaults] integerForKey:@"GBRewindLength"]);
         }
     }];
+}
+
+- (void) updateRTCMode
+{
+    if (GB_is_inited(&gb)) {
+        GB_set_rtc_mode(&gb, [[NSUserDefaults standardUserDefaults] integerForKey:@"GBRTCMode"]);
+    }
 }
 
 - (void)dmgModelChanged
