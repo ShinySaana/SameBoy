@@ -1,4 +1,9 @@
+#ifdef _WIN32
+#include <Windows/stdio.h>
+#else
 #include <stdio.h>
+#endif
+
 #include <string.h>
 #include <stdlib.h>
 #include "gb.h"

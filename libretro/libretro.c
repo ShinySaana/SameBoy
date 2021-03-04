@@ -1,4 +1,9 @@
+#ifdef _WIN32
+#include <Windows/stdio.h>
+#else
 #include <stdio.h>
+#endif
+
 #include <string.h>
 #include <stdbool.h>
 #include <unistd.h>
@@ -1422,6 +1427,14 @@ void emuka_set_audio_frequency(unsigned frequency) {
 }
 
 bool emuka_read_remory() {
+
+
+
+
+
+
+
+    
     return GB_debugger_is_stopped(&gameboy[0]);
 }
 

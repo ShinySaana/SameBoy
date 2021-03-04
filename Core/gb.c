@@ -1,3 +1,12 @@
+#ifdef _WIN32
+#include <Windows/stdio.h>
+#include <Windows/unistd.h>
+#else
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/select.h>
+#endif
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -5,10 +14,6 @@
 #include <string.h>
 #include <errno.h>
 #include <stdarg.h>
-#ifndef _WIN32
-#include <sys/select.h>
-#include <unistd.h>
-#endif
 #include "random.h"
 #include "gb.h"
 
