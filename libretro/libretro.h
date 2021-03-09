@@ -2751,7 +2751,7 @@ RETRO_API size_t retro_get_memory_size(unsigned id);
 RETRO_API void emuka_load_battery(const char *path);
 RETRO_API void emuka_save_battery(const char *path);
 RETRO_API void emuka_set_audio_frequency(unsigned frequency);
-RETRO_API bool emuka_read_remory();
+RETRO_API bool emuka_evaluate(const char* expr, uint16_t *result, uint16_t *result_bank);
 RETRO_API void emuka_run_stealth(const uint16_t jump_location);
 
 
