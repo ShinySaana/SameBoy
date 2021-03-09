@@ -1681,6 +1681,8 @@ void GB_emuka_cpu_run_stealth(GB_gameboy_t *gb, uint16_t jump_location)
     printf("PC: %x\n", gb->pc);
     printf("IME: %x\n", gb->ime);
 
+    uint64_t debugger_ticks_before = gb->debugger_ticks;
+
     uint16_t backup_pc = gb->pc;
     unsigned backup_pending_cycles = gb->pending_cycles;
     uint8_t  backup_if = gb->io_registers[GB_IO_IF];
@@ -1696,7 +1698,7 @@ void GB_emuka_cpu_run_stealth(GB_gameboy_t *gb, uint16_t jump_location)
     memset(gb->registers, 0, sizeof backup_registers);
 
 
-    printf("Starting stealth run. Debugger ticks: %lu\n", gb->debugger_ticks);
+    printf("Starting stealth run.");
 
     printf("pc before run %x\n", gb->pc);
     while (gb->emuka_stealth_enabled) {
@@ -1722,7 +1724,7 @@ void GB_emuka_cpu_run_stealth(GB_gameboy_t *gb, uint16_t jump_location)
     gb->halted = backup_halted;
     memcpy(gb->registers, backup_registers, sizeof backup_registers);
 
-    printf("Ended stealth run. Debugger ticks: %lu\n", gb->debugger_ticks);
+    printf("Ended stealth run.\n");
 
     printf("Registers after:\n");
     printf("AF: %x, ", gb->af);
@@ -1733,5 +1735,7 @@ void GB_emuka_cpu_run_stealth(GB_gameboy_t *gb, uint16_t jump_location)
     printf("Pending cycles: %x\n", gb->pending_cycles);
     printf("PC: %x\n", gb->pc);
     printf("IME: %x\n", gb->ime);
+
+    assert(gb->debugger_ticks == debugger_ticks_before);
 
 }

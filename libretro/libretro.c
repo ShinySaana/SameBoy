@@ -1426,9 +1426,7 @@ void emuka_set_audio_frequency(unsigned frequency) {
     audio_frequency = frequency;
 }
 
-bool emuka_read_remory() {
-
-
+bool emuka_read_memory() {
     return GB_debugger_is_stopped(&gameboy[0]);
 }
 
