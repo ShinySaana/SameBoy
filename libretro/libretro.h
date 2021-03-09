@@ -2752,6 +2752,7 @@ RETRO_API void emuka_load_battery(const char *path);
 RETRO_API void emuka_save_battery(const char *path);
 RETRO_API void emuka_set_audio_frequency(unsigned frequency);
 RETRO_API bool emuka_read_remory();
+RETRO_API void emuka_run_stealth(const uint16_t jump_location);
 
 
 #ifdef __cplusplus

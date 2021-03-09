@@ -1524,6 +1524,12 @@ static void cb_prefix(GB_gameboy_t *gb, uint8_t opcode)
     }
 }
 
+static void emuka_stop(GB_gameboy_t *gb, uint8_t opcode)
+{
+    gb->emuka_stealth_enabled = false;
+    printf("0xE3: Emuka stealth stop instruction reached. Continuing.\n");
+}
+
 static GB_opcode_t *opcodes[256] = {
     /*  X0          X1          X2          X3          X4          X5          X6          X7                */
     /*  X8          X9          Xa          Xb          Xc          Xd          Xe          Xf                */
@@ -1555,11 +1561,12 @@ static GB_opcode_t *opcodes[256] = {
     ret_cc,     ret,        jp_cc_a16,  cb_prefix,  call_cc_a16,call_a16,   adc_a_d8,   rst,
     ret_cc,     pop_rr,     jp_cc_a16,  ill,        call_cc_a16,push_rr,    sub_a_d8,   rst,        /* dX */
     ret_cc,     reti,       jp_cc_a16,  ill,        call_cc_a16,ill,        sbc_a_d8,   rst,
-    ld_da8_a,   pop_rr,     ld_dc_a,    ill,        ill,        push_rr,    and_a_d8,   rst,        /* eX */
+    ld_da8_a,   pop_rr,     ld_dc_a,    emuka_stop, ill,        push_rr,    and_a_d8,   rst,        /* eX */
     add_sp_r8,  jp_hl,      ld_da16_a,  ill,        ill,        ill,        xor_a_d8,   rst,
     ld_a_da8,   pop_rr,     ld_a_dc,    di,         ill,        push_rr,    or_a_d8,    rst,        /* fX */
     ld_hl_sp_r8,ld_sp_hl,   ld_a_da16,  ei,         ill,        ill,        cp_a_d8,    rst,
 };
+
 void GB_cpu_run(GB_gameboy_t *gb)
 {
     if (gb->hdma_on) {
@@ -1657,4 +1664,74 @@ void GB_cpu_run(GB_gameboy_t *gb)
         gb->hdma_on = true;
         gb->hdma_cycles = -8;
     }
+}
+
+void GB_emuka_cpu_run_stealth(GB_gameboy_t *gb, uint16_t jump_location)
+{
+    gb->emuka_stealth_enabled = true;
+    gb->emuka_timing_disabled = true;
+
+    printf("State before:\n");
+    printf("AF: %x, ", gb->af);
+    printf("BC: %x, ", gb->bc);
+    printf("DE: %x, ", gb->de);
+    printf("HL: %x, ", gb->hl);
+    printf("SP: %x\n", gb->sp);
+    printf("Pending cycles: %x\n", gb->pending_cycles);
+    printf("PC: %x\n", gb->pc);
+    printf("IME: %x\n", gb->ime);
+
+    uint16_t backup_pc = gb->pc;
+    unsigned backup_pending_cycles = gb->pending_cycles;
+    uint8_t  backup_if = gb->io_registers[GB_IO_IF];
+    bool backup_halted = gb->halted;
+    uint16_t backup_registers[GB_REGISTER_SP];
+    memcpy(backup_registers, gb->registers, sizeof backup_registers);
+
+    gb->pc = jump_location;
+    gb->pending_cycles = 0;
+    gb->io_registers[GB_IO_IF] = 0;
+    gb->halted = false;
+
+    memset(gb->registers, 0, sizeof backup_registers);
+
+
+    printf("Starting stealth run. Debugger ticks: %lu\n", gb->debugger_ticks);
+
+    printf("pc before run %x\n", gb->pc);
+    while (gb->emuka_stealth_enabled) {
+        GB_cpu_run(gb);
+        printf("Ran cpu_run, pc: %x\n", gb->pc);
+    }
+
+    printf("State after, before restoring backup:\n");
+    printf("AF: %x, ", gb->af);
+    printf("BC: %x, ", gb->bc);
+    printf("DE: %x, ", gb->de);
+    printf("HL: %x, ", gb->hl);
+    printf("SP: %x\n", gb->sp);
+    printf("Pending cycles: %x\n", gb->pending_cycles);
+    printf("PC: %x\n", gb->pc);
+    printf("IME: %x\n", gb->ime);
+
+    gb->emuka_timing_disabled = false;
+
+    gb->pc = backup_pc;
+    gb->pending_cycles = backup_pending_cycles;
+    gb->io_registers[GB_IO_IF] = backup_if;
+    gb->halted = backup_halted;
+    memcpy(gb->registers, backup_registers, sizeof backup_registers);
+
+    printf("Ended stealth run. Debugger ticks: %lu\n", gb->debugger_ticks);
+
+    printf("Registers after:\n");
+    printf("AF: %x, ", gb->af);
+    printf("BC: %x, ", gb->bc);
+    printf("DE: %x, ", gb->de);
+    printf("HL: %x, ", gb->hl);
+    printf("SP: %x\n", gb->sp);
+    printf("Pending cycles: %x\n", gb->pending_cycles);
+    printf("PC: %x\n", gb->pc);
+    printf("IME: %x\n", gb->ime);
+
 }

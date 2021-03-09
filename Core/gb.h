@@ -699,6 +699,10 @@ struct GB_gameboy_internal_s {
         /* Temporary state */
         bool wx_just_changed;
         bool tile_sel_glitch;
+
+        /* Emuka specific additions */
+        bool emuka_timing_disabled;
+        bool emuka_stealth_enabled;
    );
 };
     

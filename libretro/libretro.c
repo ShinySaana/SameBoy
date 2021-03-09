@@ -1429,13 +1429,12 @@ void emuka_set_audio_frequency(unsigned frequency) {
 bool emuka_read_remory() {
 
 
-
-
-
-
-
-    
     return GB_debugger_is_stopped(&gameboy[0]);
+}
+
+void emuka_run_stealth(const uint16_t jump_location) {
+    
+    GB_emuka_cpu_run_stealth(&gameboy[0], jump_location);
 }
 
 
