@@ -1666,7 +1666,7 @@ void GB_cpu_run(GB_gameboy_t *gb)
     }
 }
 
-void GB_emuka_cpu_run_stealth(GB_gameboy_t *gb, uint16_t jump_location)
+void GB_emuka_cpu_run_stealth(GB_gameboy_t* gb, uint16_t jump_location, uint16_t* registers)
 {
     gb->emuka_stealth_enabled = true;
     gb->emuka_timing_disabled = true;
@@ -1695,7 +1695,7 @@ void GB_emuka_cpu_run_stealth(GB_gameboy_t *gb, uint16_t jump_location)
     gb->io_registers[GB_IO_IF] = 0;
     gb->halted = false;
 
-    memset(gb->registers, 0, sizeof backup_registers);
+    memcpy(gb->registers, registers, sizeof backup_registers);
 
 
     printf("Starting stealth run.");
@@ -1715,6 +1715,8 @@ void GB_emuka_cpu_run_stealth(GB_gameboy_t *gb, uint16_t jump_location)
     printf("Pending cycles: %x\n", gb->pending_cycles);
     printf("PC: %x\n", gb->pc);
     printf("IME: %x\n", gb->ime);
+
+    memcpy(registers, gb->registers, sizeof backup_registers);
 
     gb->emuka_timing_disabled = false;
 

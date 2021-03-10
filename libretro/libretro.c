@@ -1430,8 +1430,8 @@ bool emuka_evaluate(const char* expr, uint16_t* result, uint16_t* result_bank) {
     return GB_debugger_evaluate(&gameboy[0], expr, result, result_bank);
 }
 
-void emuka_run_stealth(const uint16_t jump_location) {
-    GB_emuka_cpu_run_stealth(&gameboy[0], jump_location);
+void emuka_run_stealth(const uint16_t jump_location, uint16_t* registers) {
+    GB_emuka_cpu_run_stealth(&gameboy[0], jump_location, registers);
 }
 
 
