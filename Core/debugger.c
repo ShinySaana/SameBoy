@@ -521,14 +521,15 @@ value_t debugger_evaluate(GB_gameboy_t *gb, const char *string,
         if (depth == 0) {
             value_t addr = debugger_evaluate(gb, string + 1, length - 2, error, watchpoint_address, watchpoint_new_value);
             banking_state_t state;
-            if (addr.bank) {
+            // if (addr.bank) {
                 save_banking_state(gb, &state);
+                printf("Saving banking state\n");
                 switch_banking_state(gb, addr.bank);
-            }
+            // }
             ret = VALUE_16(GB_read_memory(gb, addr.value));
-            if (addr.bank) {
+            // if (addr.bank) {
                 restore_banking_state(gb, &state);
-            }
+            // }
             goto exit;
         }
     }
