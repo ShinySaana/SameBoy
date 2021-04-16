@@ -2753,8 +2753,11 @@ RETRO_API void emuka_save_battery(const char *path);
 RETRO_API void emuka_set_audio_frequency(unsigned frequency);
 RETRO_API bool emuka_evaluate(const char* expr, uint16_t *result, uint16_t *result_bank);
    
-// registers must at least 10 bytes large 
-RETRO_API void emuka_run_stealth(const uint16_t jump_location, uint16_t* registers); 
+// registers must be at least 10 bytes large 
+RETRO_API void emuka_run_stealth(const uint16_t jump_location, uint16_t* registers);
+
+RETRO_API void emuka_modify_interrupt_flags(uint8_t flag, bool enable); 
+
 
 
 #ifdef __cplusplus

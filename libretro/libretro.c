@@ -1434,4 +1434,20 @@ void emuka_run_stealth(const uint16_t jump_location, uint16_t* registers) {
     GB_emuka_cpu_run_stealth(&gameboy[0], jump_location, registers);
 }
 
+void emuka_modify_interrupt_flags(uint8_t flag, bool enable) {
+    uint8_t interrupts = gameboy[0].io_registers[GB_IO_IF];
+    uint8_t interrupt_enable = gameboy[0].interrupt_enable;
 
+    printf("\nif before: %x\n", interrupts);
+
+    if (enable) {
+        interrupts = interrupts | flag;
+        interrupt_enable = interrupt_enable | flag;
+    } else {
+        interrupts = interrupts & ~flag;
+    }
+
+    gameboy[0].io_registers[GB_IO_IF] = interrupts;
+    gameboy[0].interrupt_enable = interrupt_enable;
+    printf("\nif after: %x\n", interrupts);
+}
