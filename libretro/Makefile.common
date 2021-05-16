@@ -22,6 +22,7 @@ SOURCES_C   := $(CORE_DIR)/Core/gb.c \
                $(CORE_DIR)/Core/sm83_disassembler.c \
                $(CORE_DIR)/libretro/agb_boot.c \
                $(CORE_DIR)/libretro/cgb_boot.c \
+               $(CORE_DIR)/libretro/cgb_fast_boot.c \
                $(CORE_DIR)/libretro/dmg_boot.c \
                $(CORE_DIR)/libretro/sgb_boot.c \
                $(CORE_DIR)/libretro/sgb2_boot.c \

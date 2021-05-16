@@ -111,8 +111,8 @@ char retro_game_path[4096];
 
 GB_gameboy_t gameboy[2];
 
-extern const unsigned char dmg_boot[], cgb_boot[], agb_boot[], sgb_boot[], sgb2_boot[];
-extern const unsigned dmg_boot_length, cgb_boot_length, agb_boot_length, sgb_boot_length, sgb2_boot_length;
+extern const unsigned char dmg_boot[], cgb_boot[], cgb_fast_boot[], agb_boot[], sgb_boot[], sgb2_boot[];
+extern const unsigned dmg_boot_length, cgb_boot_length, cgb_fast_boot_length, agb_boot_length, sgb_boot_length, sgb2_boot_length;
 bool vblank1_occurred = false, vblank2_occurred = false;
 
 static void fallback_log(enum retro_log_level level, const char *fmt, ...)
@@ -403,7 +403,7 @@ static void boot_rom_load(GB_gameboy_t *gb, GB_boot_rom_t type)
         [GB_BOOT_ROM_SGB] = sgb_boot,
         [GB_BOOT_ROM_SGB2] = sgb2_boot,
         [GB_BOOT_ROM_CGB0] = cgb_boot, // cgb0 not implemented yet
-        [GB_BOOT_ROM_CGB] = cgb_boot,
+        [GB_BOOT_ROM_CGB] = cgb_fast_boot,
         [GB_BOOT_ROM_AGB] = agb_boot,
     }[type];
     
@@ -414,7 +414,7 @@ static void boot_rom_load(GB_gameboy_t *gb, GB_boot_rom_t type)
         [GB_BOOT_ROM_SGB] = sgb_boot_length,
         [GB_BOOT_ROM_SGB2] = sgb2_boot_length,
         [GB_BOOT_ROM_CGB0] = cgb_boot_length, // cgb0 not implemented yet
-        [GB_BOOT_ROM_CGB] = cgb_boot_length,
+        [GB_BOOT_ROM_CGB] = cgb_fast_boot_length,
         [GB_BOOT_ROM_AGB] = agb_boot_length,
     }[type];
     
